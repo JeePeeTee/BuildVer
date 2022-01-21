@@ -14,4 +14,3 @@ D:\Dev\Tools\BuildVer\BuildVer\obj\Debug\net6.0\BuildVer.pdb
 D:\Dev\Tools\BuildVer\BuildVer\obj\Debug\net6.0\BuildVer.genruntimeconfig.cache
 D:\Dev\Tools\BuildVer\BuildVer\bin\Debug\net6.0\CommandLine.dll
 D:\Dev\Tools\BuildVer\BuildVer\obj\Debug\net6.0\BuildVer.csproj.CopyComplete
-D:\Dev\Tools\BuildVer\BuildVer\obj\Debug\net6.0\BuildVer.csproj.AssemblyReference.cache
