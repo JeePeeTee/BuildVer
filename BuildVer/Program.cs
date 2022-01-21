@@ -81,7 +81,7 @@ internal static class Program {
             "Month" => DateTime.Now.Date.Month,
             "YearMonth" => (DateTime.Now.Year % 100) * 100 + DateTime.Now.Date.Month,
             "Time" => DateTime.Now.Hour * 100 + DateTime.Now.Minute,
-            "UTCTime" => DateTime.Now.ToUniversalTime().Hour * 100 + DateTime.Now.ToUniversalTime().Minute,
+            "UTCTime" => DateTime.UtcNow.Hour * 100 + DateTime.UtcNow.Minute,
             "None" => 0,
             _ => 0
 
