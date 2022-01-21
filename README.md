@@ -4,7 +4,7 @@ Modify AssemblyInfoFile and assign custom version numbering during the pre-build
 
 Ussage:
 
-Place into pre build event.
+Place into pre build event of visual studio.
 
 Sample #1
 <BduildVer location>\BuildVer.exe -p $(ProjectName) -a "$(SolutionDir)$(ProjectName)\Properties\AssemblyInfo.cs" -v ShortYear -m Quarter -b Date -r Time
