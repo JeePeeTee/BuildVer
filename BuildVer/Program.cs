@@ -83,7 +83,7 @@ internal static class Program {
             "Time" => DateTime.Now.Hour * 100 + DateTime.Now.Minute,
             "UTCTime" => DateTime.UtcNow.Hour * 100 + DateTime.UtcNow.Minute,
             "DayOfYear" => DateTime.Now.DayOfYear,
-            "DateYear" => DateTime.Now.DayOfYear * 1000 + (DateTime.Now.Year % 100),
+            "DateYear" => (DateTime.Now.Year % 100) * 1000 + DateTime.Now.DayOfYear,
             "None" => 0,
             _ => 0
 
