@@ -10,10 +10,10 @@ namespace BuildVer;
 
 // Ussage: Pre build Event
 // Sample #1
-// <BduildVer location>\BuildVer.exe -p $(ProjectName) -a "$(SolutionDir)$(ProjectName)\Properties\AssemblyInfo.cs" -v ShortYear -m Quarter -b Date -r Time
+// <BuildVer location>\BuildVer.exe -p $(ProjectName) -a "$(SolutionDir)$(ProjectName)\Properties\AssemblyInfo.cs" -v ShortYear -m Quarter -b Date -r Time
 // Results in versions # 22.1.121.1342
 // Sample #2
-// <BduildVer location>\BuildVer.exe -p $(ProjectName) -a "$(SolutionDir)$(ProjectName)\Properties\AssemblyInfo.cs" -v ShortYear -m Quarter -b None -r None
+// <BuildVer location>\BuildVer.exe -p $(ProjectName) -a "$(SolutionDir)$(ProjectName)\Properties\AssemblyInfo.cs" -v ShortYear -m Quarter -b None -r None
 // Results in versions # 22.1.0.0
 
 internal static class Program {
@@ -82,13 +82,13 @@ internal static class Program {
             "YearMonth" => (DateTime.Now.Year % 100) * 100 + DateTime.Now.Date.Month,
             "Time" => DateTime.Now.Hour * 100 + DateTime.Now.Minute,
             "UTCTime" => DateTime.UtcNow.Hour * 100 + DateTime.UtcNow.Minute,
+            "DayOfYear" => DateTime.Now.DayOfYear,
+            "DateYear" => DateTime.Now.DayOfYear * 1000 + (DateTime.Now.Year % 100),
             "None" => 0,
             _ => 0
 
             // ToDo
             // Increment 
-            // DayOfYear (ddd)
-            // DateYear (yyddd)
             // DeltaDays (days since 1/1/2000)
             // UTCSeconds (seconds since midnight)
         };
