@@ -94,16 +94,14 @@ internal static class Program {
             "UTCTime" => DateTime.UtcNow.Hour * 100 + DateTime.UtcNow.Minute,
             "DayOfYear" => DateTime.Now.DayOfYear,
             "DateYear" => (DateTime.Now.Year % 100) * 1000 + DateTime.Now.DayOfYear,
+            "DeltaDays" => (DateTime.Today - new DateTime(2000,1,1)).Days,
+            "UTCSeconds" => (DateTime.Now.ToUniversalTime() - DateTime.Today.ToUniversalTime()).Seconds,
             "None" => 0,
             "Increment" => GetCurrent(line, idx) + 1,
             "Current" => GetCurrent(line, idx),
             "Reset" => 0,
 
             _ => 0
-
-            // ToDo
-            // DeltaDays (days since 1/1/2000)
-            // UTCSeconds (seconds since midnight)
         };
     }
 
