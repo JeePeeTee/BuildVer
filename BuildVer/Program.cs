@@ -27,11 +27,6 @@ internal static class Program {
     private const int idxRevision = 3;
 
     static void Main(string[] args) {
-
-        var start = DateTime.UtcNow;
-        var end = DateTime.Today.ToUniversalTime();
-        var total = (start - end).TotalSeconds;
-
         try {
             Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o => {
                 //the first argument must be the assembly info file
