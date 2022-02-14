@@ -42,6 +42,7 @@ internal static class Program {
                 foreach (var line in allLines) {
                     ReplaceLineContent(o, "AssemblyFileVersion", assemblyInfoFile, line);
                     ReplaceLineContent(o, "AssemblyVersion", assemblyInfoFile, line);
+                    ReplaceLineContent(o, "AssemblyInformationalVersion", assemblyInfoFile, line);
                 }
             });
         }
@@ -101,7 +102,6 @@ internal static class Program {
             _ => 0
 
             // ToDo
-            // Increment 
             // DeltaDays (days since 1/1/2000)
             // UTCSeconds (seconds since midnight)
         };
