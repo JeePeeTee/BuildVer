@@ -27,6 +27,11 @@ internal static class Program {
     private const int idxRevision = 3;
 
     static void Main(string[] args) {
+
+        var start = DateTime.UtcNow;
+        var end = DateTime.Today.ToUniversalTime();
+        var total = (start - end).TotalSeconds;
+
         try {
             Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o => {
                 //the first argument must be the assembly info file
@@ -95,7 +100,7 @@ internal static class Program {
             "DayOfYear" => DateTime.Now.DayOfYear,
             "DateYear" => (DateTime.Now.Year % 100) * 1000 + DateTime.Now.DayOfYear,
             "DeltaDays" => (DateTime.Today - new DateTime(2000,1,1)).Days,
-            "UTCSeconds" => (DateTime.Now.ToUniversalTime() - DateTime.Today.ToUniversalTime()).Seconds,
+            "UTCSeconds" => Convert.ToInt32((DateTime.Now - DateTime.Today).TotalSeconds), // Utc or Local is same!?
             "None" => 0,
             "Increment" => GetCurrent(line, idx) + 1,
             "Current" => GetCurrent(line, idx),
@@ -114,12 +119,10 @@ internal static class Program {
         else {
             var tmpIdx = -1;
 
-
             tmpIdx = line.Select((c, i) => new { Char = c, Index = i })
                 .Where(item => item.Char == '.')
                 .Skip(idx - 1)
                 .FirstOrDefault()!.Index;
-
 
             sub = line[(tmpIdx + 1)..];
         }
