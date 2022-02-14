@@ -17,8 +17,8 @@ namespace BuildVer;
 // Results in versions # 22.1.0.0
 
 // Sample #3 (Debug & Release) variants
-// IF $(ConfigurationName) == Debug([BuildVer location]\BuildVer.exe -p $(ProjectName) -a "$(SolutionDir)$(ProjectName)\Properties\AssemblyInfo.cs" -v None -m None -b Increment -r UTCTime)
-// ELSE ([BuildVer location]\BuildVer.exe -p $(ProjectName) -a "$(SolutionDir)$(ProjectName)\Properties\AssemblyInfo.cs" -v None -m Increment -b Increment -r UTCTime)
+// IF $(ConfigurationName) == Debug([BuildVer location]\BuildVer.exe -p $(ProjectName) -a "$(SolutionDir)$(ProjectName)\Properties\AssemblyInfo.cs" -v Current -m Current -b Increment -r UTCTime)
+// ELSE ([BuildVer location]\BuildVer.exe -p $(ProjectName) -a "$(SolutionDir)$(ProjectName)\Properties\AssemblyInfo.cs" -v Current -m Increment -b Increment -r UTCTime)
 
 internal static class Program {
     private const int idxVersion = 0;
@@ -54,7 +54,6 @@ internal static class Program {
     }
 
     private static void ReplaceLineContent(Options o, string lineType, string assemblyInfoFile, string line) {
-        
         if (!line.Contains(lineType)) return;
         if (line.IndexOf("//", StringComparison.Ordinal) < line.IndexOf(lineType, StringComparison.Ordinal)) return;
 
@@ -96,6 +95,7 @@ internal static class Program {
             "DateYear" => (DateTime.Now.Year % 100) * 1000 + DateTime.Now.DayOfYear,
             "None" => 0,
             "Increment" => GetCurrent(line, idx) + 1,
+            "Current" => GetCurrent(line, idx),
             "Reset" => 0,
 
             _ => 0
@@ -105,6 +105,32 @@ internal static class Program {
             // DeltaDays (days since 1/1/2000)
             // UTCSeconds (seconds since midnight)
         };
+    }
+
+    private static short GetCurrent(string line, int idx) {
+        var sub = "";
+
+        if (idx == idxVersion) {
+            sub = line[(line.IndexOf('"') + 1)..];
+        }
+        else {
+            var tmpIdx = -1;
+
+
+            tmpIdx = line.Select((c, i) => new { Char = c, Index = i })
+                .Where(item => item.Char == '.')
+                .Skip(idx - 1)
+                .FirstOrDefault()!.Index;
+
+
+            sub = line[(tmpIdx + 1)..];
+        }
+
+        sub = sub[..(idx == idxRevision ? sub.IndexOf('"') : sub.IndexOf('.'))];
+
+        short.TryParse(sub, out var val);
+
+        return val;
     }
 
     public class Options {
@@ -125,33 +151,5 @@ internal static class Program {
 
         [Option('r', "revision", Required = true, HelpText = "Revision format (ShortYear)")]
         public string? Revision { get; set; }
-    }
-
-    private static short GetCurrent(string line, int idx) {
-        var sub = "";
-
-        if (idx == idxVersion)
-        {
-            sub = line[(line.IndexOf('"') + 1)..];
-        }
-        else
-        {
-            var tmpIdx = -1;
-
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-            tmpIdx = line.Select((c, i) => new { Char = c, Index = i })
-                .Where(item => item.Char == '.')
-                .Skip(idx - 1)
-                .FirstOrDefault().Index;
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-
-            sub = line[(tmpIdx + 1)..];
-        }
-
-        sub = sub[..(idx == idxRevision ? sub.IndexOf('"') : sub.IndexOf('.'))];
-
-        short.TryParse(sub, out var val);
-
-        return val;
     }
 }
