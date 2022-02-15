@@ -24,10 +24,6 @@ namespace BuildVer;
 // Results when in DEBUG old version: 3.4.5.678 >> new version: 3.5.6.789
 
 internal static class Program {
-    private const int idxVersion = 0;
-    private const int idxMinor = 1;
-    private const int idxBuild = 2;
-    private const int idxRevision = 3;
 
     static void Main(string[] args) {
         try {
@@ -72,12 +68,12 @@ internal static class Program {
         var currBuild = Convert.ToInt32(m.Groups["Build"].Value);
         var currRevision = Convert.ToInt32(m.Groups["Revision"].Value);
 
-        var major = GetValue(o.Version, currMajor, line);
-        var minor = GetValue(o.Minor, currMinor, line);
-        var build = GetValue(o.Build, currBuild, line);
-        var revision = GetValue(o.Revision, currRevision, line);
+        var newMajor = GetValue(o.Version, currMajor, line);
+        var newMinor = GetValue(o.Minor, currMinor, line);
+        var newBuild = GetValue(o.Build, currBuild, line);
+        var newRevision = GetValue(o.Revision, currRevision, line);
 
-        var newline = $"[assembly: {lineType}(\"{major}.{minor}.{build}.{revision}\")]";
+        var newline = $"[assembly: {lineType}(\"{newMajor}.{newMinor}.{newBuild}.{newRevision}\")]";
 
         var fileContent = File.ReadAllText(assemblyInfoFile);
         var newContent = fileContent.Replace(line, newline);
@@ -85,7 +81,7 @@ internal static class Program {
         //write the text back into the file
         File.WriteAllText(assemblyInfoFile, newContent, Encoding.UTF8);
 
-        if (lineType == "AssemblyVersion") Console.WriteLine($"{o.Project} Old version: {currMajor}.{currMinor}.{currBuild}.{currRevision}  >> New version: {major}.{minor}.{build}.{revision}");
+        if (lineType == "AssemblyVersion") Console.WriteLine($"{o.Project} Old version: {currMajor}.{currMinor}.{currBuild}.{currRevision}  >> New version: {newMajor}.{newMinor}.{newBuild}.{newRevision}");
     }
 
     private static int GetQuarter(this DateTime date) {
