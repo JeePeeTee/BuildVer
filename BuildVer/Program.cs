@@ -2,6 +2,7 @@
 #region usings
 
 using System.Text;
+using System.Text.RegularExpressions;
 using CommandLine;
 
 #endregion
@@ -19,6 +20,8 @@ namespace BuildVer;
 // Sample #3 (Debug & Release) variants
 // IF $(ConfigurationName) == Debug([BuildVer location]\BuildVer.exe -p $(ProjectName) -a "$(SolutionDir)$(ProjectName)\Properties\AssemblyInfo.cs" -v Current -m Current -b Increment -r UTCTime)
 // ELSE ([BuildVer location]\BuildVer.exe -p $(ProjectName) -a "$(SolutionDir)$(ProjectName)\Properties\AssemblyInfo.cs" -v Current -m Increment -b Increment -r UTCTime)
+// Results when in RELEASE old version:  3.4.5.678 >> new version: 3.4.6.789
+// Results when in DEBUG old version: 3.4.5.678 >> new version: 3.5.6.789
 
 internal static class Program {
     private const int idxVersion = 0;
@@ -61,10 +64,18 @@ internal static class Program {
         // [assembly: AssemblyVersion("22.1.0.0")]
         // [assembly: AssemblyFileVersion("22.1.0.0")]
 
-        var major = GetValue(o.Version, idxVersion, line);
-        var minor = GetValue(o.Minor, idxMinor, line);
-        var build = GetValue(o.Build, idxBuild, line);
-        var revision = GetValue(o.Revision, idxRevision, line);
+        var pattern = new Regex(@"(?<Major>\d+)(\.)(?<Minor>\d+)(\.)(?<Build>\d+)(\.)(?<Revision>\d+)");
+        var m = pattern.Match(line);
+
+        var currMajor = Convert.ToInt32(m.Groups["Major"].Value);
+        var currMinor = Convert.ToInt32(m.Groups["Minor"].Value);
+        var currBuild = Convert.ToInt32(m.Groups["Build"].Value);
+        var currRevision = Convert.ToInt32(m.Groups["Revision"].Value);
+
+        var major = GetValue(o.Version, currMajor, line);
+        var minor = GetValue(o.Minor, currMinor, line);
+        var build = GetValue(o.Build, currBuild, line);
+        var revision = GetValue(o.Revision, currRevision, line);
 
         var newline = $"[assembly: {lineType}(\"{major}.{minor}.{build}.{revision}\")]";
 
@@ -74,14 +85,14 @@ internal static class Program {
         //write the text back into the file
         File.WriteAllText(assemblyInfoFile, newContent, Encoding.UTF8);
 
-        if (lineType == "AssemblyVersion") Console.WriteLine($"{o.Project} version: {major}.{minor}.{build}.{revision}");
+        if (lineType == "AssemblyVersion") Console.WriteLine($"{o.Project} Old version: {currMajor}.{currMinor}.{currBuild}.{currRevision}  >> New version: {major}.{minor}.{build}.{revision}");
     }
 
     private static int GetQuarter(this DateTime date) {
         return (date.Month + 2) / 3;
     }
 
-    private static int GetValue(string? param, int idx, string line) {
+    private static int GetValue(string? param, int currValue, string line) {
         return param switch {
             "ShortYear" => DateTime.Now.Year % 100,
             "Year" => DateTime.Now.Year,
@@ -95,40 +106,15 @@ internal static class Program {
             "DayOfYear" => DateTime.Now.DayOfYear,
             "DateYear" => (DateTime.Now.Year % 100) * 1000 + DateTime.Now.DayOfYear,
             "DeltaDays" => (DateTime.Today - new DateTime(2000,1,1)).Days,
-            "UTCSeconds" => Convert.ToInt32((DateTime.Now - DateTime.Today).TotalSeconds), // Utc or Local is same!?
+            "UTCSeconds" => Convert.ToInt32((DateTime.Now - DateTime.Today).TotalSeconds), // Utc or Local == same!?
             "None" => 0,
-            "Increment" => GetCurrent(line, idx) + 1,
-            "Current" => GetCurrent(line, idx),
+            "Increment" => currValue + 1,
+            "Current" => currValue,
             "Reset" => 0,
 
             _ => 0
         };
     }
-
-    private static short GetCurrent(string line, int idx) {
-        var sub = "";
-
-        if (idx == idxVersion) {
-            sub = line[(line.IndexOf('"') + 1)..];
-        }
-        else {
-            var tmpIdx = -1;
-
-            tmpIdx = line.Select((c, i) => new { Char = c, Index = i })
-                .Where(item => item.Char == '.')
-                .Skip(idx - 1)
-                .FirstOrDefault()!.Index;
-
-            sub = line[(tmpIdx + 1)..];
-        }
-
-        sub = sub[..(idx == idxRevision ? sub.IndexOf('"') : sub.IndexOf('.'))];
-
-        short.TryParse(sub, out var val);
-
-        return val;
-    }
-
     public class Options {
         [Option('p', "project", Required = true, HelpText = "Project name")]
         public string? Project { get; set; }
