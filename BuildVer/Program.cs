@@ -53,19 +53,25 @@ internal static class Program {
         }
     }
 
+    private static int GetValueFromGroup(Match m, string groupName) {
+        var groupValue = m.Groups[groupName].Value;
+        if (string.IsNullOrEmpty(groupValue)) return -1;
+        return groupValue == "*" ? 0 : Convert.ToInt32(groupValue);
+    }
+
     private static void ReplaceLineContent(Options o, string lineType, string assemblyInfoFile, string line) {
         if (!line.Contains(lineType)) return;
 
         // [assembly: AssemblyVersion("22.1.0.0")]
         // [assembly: AssemblyFileVersion("22.1.0.0")]
 
-        var pattern = new Regex(@"(?<Major>\d+)(\.)(?<Minor>\d+)(\.)(?<Build>\d+)(\.)(?<Revision>\d+)");
+        var pattern = new Regex(@"(?<Major>\d+)(\.)(?<Minor>([0-9]+|\*))?(\.?)(?<Build>([0-9]+|\*))?(\.?)(?<Revision>([0-9]+|\*)?)");
         var m = pattern.Match(line);
 
-        var currMajor = Convert.ToInt32(m.Groups["Major"].Value);
-        var currMinor = Convert.ToInt32(m.Groups["Minor"].Value);
-        var currBuild = Convert.ToInt32(m.Groups["Build"].Value);
-        var currRevision = Convert.ToInt32(m.Groups["Revision"].Value);
+        var currMajor = GetValueFromGroup(m, "Major");
+        var currMinor = GetValueFromGroup(m, "Minor");
+        var currBuild = GetValueFromGroup(m, "Build");
+        var currRevision = GetValueFromGroup(m, "Revision");
 
         var newMajor = GetValue(o.Version, currMajor, line);
         var newMinor = GetValue(o.Minor, currMinor, line);
@@ -80,7 +86,7 @@ internal static class Program {
         //write the text back into the file
         File.WriteAllText(assemblyInfoFile, newContent, Encoding.UTF8);
 
-        if (lineType == "AssemblyVersion") Console.WriteLine($"{o.Project} Old version: {currMajor}.{currMinor}.{currBuild}.{currRevision}  >> New version: {newMajor}.{newMinor}.{newBuild}.{newRevision}");
+        if (lineType == "AssemblyVersion") Console.WriteLine($"{o.Project} Old version: {currMajor}.{currMinor}.{currBuild}.{currRevision} >> New version: {newMajor}.{newMinor}.{newBuild}.{newRevision}");
     }
 
     private static int GetQuarter(this DateTime date) {
