@@ -106,7 +106,8 @@ internal static class Program {
     }
 
     private static short GetCurrent(string line, int idx) {
-        var sub = "";
+        if (line.Count(f => f == '.') < idx) return 0;
+        string sub = "";
 
         if (idx == idxVersion) {
             sub = line[(line.IndexOf('"') + 1)..];
@@ -124,9 +125,10 @@ internal static class Program {
 
         sub = sub[..(idx == idxRevision ? sub.IndexOf('"') : sub.IndexOf('.'))];
 
-        short.TryParse(sub, out var val);
-
-        return val;
+        if(short.TryParse(sub, out var val))
+            return val;
+        else
+            return 0;
     }
 
     public class Options {
