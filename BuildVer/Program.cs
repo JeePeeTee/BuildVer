@@ -55,7 +55,6 @@ internal static class Program {
 
     private static void ReplaceLineContent(Options o, string lineType, string assemblyInfoFile, string line) {
         if (!line.Contains(lineType)) return;
-        if (line.IndexOf("//", StringComparison.Ordinal) < line.IndexOf(lineType, StringComparison.Ordinal)) return;
 
         // [assembly: AssemblyVersion("22.1.0.0")]
         // [assembly: AssemblyFileVersion("22.1.0.0")]

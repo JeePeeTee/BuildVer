@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "BuildVer": {
+      "commandName": "Project",
+      "commandLineArgs": "d:\\Dev\\Tools\\BuildVer\\BuildVer\\bin\\Debug\\net6.0\\BuildVer.exe -p \"SCRM.Module\" -a \"d:\\Dev\\Projects\\SCRM - V21.1\\SCRM\\SCRM.Module\\Properties\\AssemblyInfo.cs\" -v ShortYear -m Quarter -b Date -r Time"
+    }
+  }
+}
