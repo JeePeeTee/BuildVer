@@ -78,7 +78,14 @@ internal static class Program {
         var newBuild = GetValue(o.Build, currBuild, line);
         var newRevision = GetValue(o.Revision, currRevision, line);
 
-        var newline = $"[assembly: {lineType}(\"{newMajor}.{newMinor}.{newBuild}.{newRevision}\")]";
+        var version = string.Empty;
+
+        // Support for shorter versions....
+        if (newBuild == -1) version = $"{newMajor}.{newMinor}";
+        else if (newRevision == -1) version = $"{newMajor}.{newMinor}.{newBuild}";
+        else version = $"{newMajor}.{newMinor}.{newBuild}.{newRevision}";
+
+        var newline = $"[assembly: {lineType}(\"{version}\")]";
 
         var fileContent = File.ReadAllText(assemblyInfoFile);
         var newContent = fileContent.Replace(line, newline);
@@ -86,7 +93,7 @@ internal static class Program {
         //write the text back into the file
         File.WriteAllText(assemblyInfoFile, newContent, Encoding.UTF8);
 
-        if (lineType == "AssemblyVersion") Console.WriteLine($"{o.Project} Old version: {currMajor}.{currMinor}.{currBuild}.{currRevision} >> New version: {newMajor}.{newMinor}.{newBuild}.{newRevision}");
+        if (lineType == "AssemblyVersion") Console.WriteLine($"{o.Project} Old version: {currMajor}.{currMinor}.{currBuild}.{currRevision} >> New version: {version}");
     }
 
     private static int GetQuarter(this DateTime date) {
