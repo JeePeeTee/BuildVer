@@ -73,19 +73,16 @@ internal static class Program {
         var currBuild = GetValueFromGroup(m, "Build");
         var currRevision = GetValueFromGroup(m, "Revision");
 
+        var currVersion = GetVersion(currMajor, currMinor, currBuild, currRevision);
+
         var newMajor = GetValue(o.Version, currMajor, line);
         var newMinor = GetValue(o.Minor, currMinor, line);
         var newBuild = GetValue(o.Build, currBuild, line);
         var newRevision = GetValue(o.Revision, currRevision, line);
 
-        var version = string.Empty;
+        var newVersion = GetVersion(newMajor, newMinor, newBuild,newRevision);
 
-        // Support for shorter versions....
-        if (newBuild == -1) version = $"{newMajor}.{newMinor}";
-        else if (newRevision == -1) version = $"{newMajor}.{newMinor}.{newBuild}";
-        else version = $"{newMajor}.{newMinor}.{newBuild}.{newRevision}";
-
-        var newline = $"[assembly: {lineType}(\"{version}\")]";
+        var newline = $"[assembly: {lineType}(\"{newVersion}\")]";
 
         var fileContent = File.ReadAllText(assemblyInfoFile);
         var newContent = fileContent.Replace(line, newline);
@@ -93,7 +90,17 @@ internal static class Program {
         //write the text back into the file
         File.WriteAllText(assemblyInfoFile, newContent, Encoding.UTF8);
 
-        if (lineType == "AssemblyVersion") Console.WriteLine($"{o.Project} Old version: {currMajor}.{currMinor}.{currBuild}.{currRevision} >> New version: {version}");
+        if (lineType == "AssemblyVersion") Console.WriteLine($"{o.Project} Current version: {currVersion} >> New version: {newVersion}");
+    }
+
+    private static string GetVersion(int newMajor, int newMinor, int newBuild, int newRevision) {
+        string result;
+        // Support for shorter versions....
+        if (newBuild == -1) result = $"{newMajor}.{newMinor}";
+        else if (newRevision == -1) result = $"{newMajor}.{newMinor}.{newBuild}";
+        else result = $"{newMajor}.{newMinor}.{newBuild}.{newRevision}";
+
+        return result;
     }
 
     private static int GetQuarter(this DateTime date) {
